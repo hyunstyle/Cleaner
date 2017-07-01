@@ -2,4 +2,4 @@
 igdc 2D Game
 
 Contributor :
-Gwak Jin Sung , You Sang Hyen , Lee Jong Won
+Gwak Jin Sung , You Sang Hyeon , Lee Jong Won
