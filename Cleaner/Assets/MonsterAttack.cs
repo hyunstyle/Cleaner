@@ -52,15 +52,4 @@ public class MonsterAttack : MonoBehaviour
        
      
     }
-
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if(other.tag == "scavenger")
-        {
-            Debug.Log("force : " + MonsterMoveMent.xForce + ", " + MonsterMoveMent.yForce);
-            this.transform.GetComponent<Rigidbody2D>().AddRelativeForce(5000f * new Vector2(-MonsterMoveMent.xForce, -MonsterMoveMent.yForce));
-            //Debug.Log("after force : " + MonsterMoveMent.xForce + ", " + MonsterMoveMent.yForce);
-            //Debug.Log("call~~~!");
-        }
-    }
 }

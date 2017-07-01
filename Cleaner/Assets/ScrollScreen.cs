@@ -3,24 +3,11 @@ using System.Collections;
 
 public class ScrollScreen : MonoBehaviour
 {
-    RectTransform Scr;
-    private Vector2 UpScreen;
-    private Vector2 DownScreen;
-    private Vector2 LeftScreen;
-    private Vector2 RightScreen;
 
     public GameObject Cam;
     private const float z_cam = -400;
-
-    //임시
-    public GameObject C;
-    public GameObject R1;
-    public GameObject R2;
-    public GameObject R3;
-    public GameObject R4;
-    public GameObject R5;
-
     
+
     public GameObject UIPanel; // 0621 상현 UI panel 따라오게 만들기 
 
     public float smoothTime = 0.3f;
@@ -44,55 +31,16 @@ public class ScrollScreen : MonoBehaviour
 
     private int x_c;
     private int y_c;
-    public static int roomCount;
+    public int roomCount  = 10;
+
+    public GameObject prefab;
 
 
-    // initial map making
-    public void makeMap()
-    {
-        // 임시
-        // 맵만드는걸 여기다라 하자
-        //1. ismap 배열으로 생성하여 map 배열에 적용 
-        //2. map 배열에 먼저 만들어 생성한뒤 ismap 에 적용
-
-        //현재는 맵이 이미 만들어져 있으므로 2번 방법으로 함 1번으로 하면 조켔당 랜덤으로 첨에 만들어서
-
-        map[3, 3] = C;
-        map[2, 3] = R1; // up
-        map[3, 4] = R2; // right
-        map[3, 2] = R3; // left
-        map[4, 3] = R4; // down
-        map[3, 5] = R5; // another room
-
-        // 임시
-
-        for (int i = 0; i < 6; i++)
-        {
-            for (int j = 0; j < 6; j++)
-            {
-                if (map[i, j] != null)
-                {
-                    ismap[i, j] = true;
-                }
-            }
-        }
-
-
-    }
 
 
     // Use this for initialization
     void Start()
     {
-
-
-        UpScreen = new Vector2(0, 1330);
-        DownScreen = new Vector2(0, -1330);
-        LeftScreen = new Vector2(800, 0);
-        RightScreen = new Vector2(-800, 0);
-
-
-
         begin0 += onTouch;
         end0 += onTouch;
         move0 += onTouch;
@@ -108,10 +56,38 @@ public class ScrollScreen : MonoBehaviour
             }
         }
 
-        makeMap();
 
+        initailizeMap();
+
+        string s = "";
+        for (int i = 0; i < 6; i++)
+        {
+            for (int j = 0; j < 6; j++)
+            {
+                if(ismap[i,j]== true)
+                {
+                    s += "t ";
+                }
+                else
+                {
+                    s += "f ";
+                }
+            }
+            s += "\n";
+        }
+        Debug.Log(s);
+
+
+        makePrefab();
     }
 
+    /*
+    위로 x -1
+    아래로 x +1
+    왼쪽 y -1
+    오른쪽 y +1
+
+    */
     void initailizeMap()
     {
 
@@ -132,19 +108,19 @@ public class ScrollScreen : MonoBehaviour
             {
                 // 왼쪽
                 case 0:
-                    check = checkIsMap(now_x - 1, now_y);
+                    check = checkIsMap(now_x, now_y - 1);
                     break;
                 // 오른쪽
                 case 1:
-                    check = checkIsMap(now_x + 1, now_y);
+                    check = checkIsMap(now_x, now_y + 1);
                     break;
                 // 위쪽
                 case 2:
-                    check = checkIsMap(now_x, now_y + 1);
+                    check = checkIsMap(now_x - 1, now_y );
                     break;
                 // 아래쪽
                 case 3:
-                    check = checkIsMap(now_x, now_y - 1);
+                    check = checkIsMap(now_x + 1, now_y);
                     break;
                 // 처음맵으로 돌아가 다시 initialize
                 case 4:
@@ -160,6 +136,31 @@ public class ScrollScreen : MonoBehaviour
             }
         }
 
+    }
+    int x = 100;
+    int y = 100;
+    string k = "box";
+    int c = 0;
+    void makePrefab()
+    {
+        for(int i = 0; i<6; i ++ )
+        {
+            for(int j= 0; j< 6; j++)
+            {
+                if(i == x_c && j == y_c)
+                {
+                    GameObject me = Instantiate(prefab);
+                    me.name = k + "Center";
+                    me.transform.position = new Vector2(x * i, y * j);
+                }
+                else if(ismap[i,j] == true)
+                {
+                    GameObject me = Instantiate(prefab);
+                    me.name = k + ++c;
+                    me.transform.position = new Vector2(x *i, y * j);
+                }
+            }
+        }
     }
 
     bool checkIsMap(int x, int y)
@@ -226,15 +227,17 @@ public class ScrollScreen : MonoBehaviour
             case 0: // 위로 쓸어넘기기 ( ↑ )
                 if ((now_x - 1) >= 0 && ismap[now_x - 1, now_y] == true)
                 {
+                    Debug.Log("" + (now_x - 1) + " " + now_y);
                     now_x--;
                     //Scr.Translate(UpScreen);
+                    Debug.Log("위로 올라가기");
                     x_current = Cam.transform.position.x;
                     y_current = Cam.transform.position.y;
 
                     x_target = Cam.transform.position.x;
                     y_target = Cam.transform.position.y - 1330;
-                    
-                    
+
+
                     StartCoroutine(smoothMove(x_current, y_current, x_target, y_target));
                     UIPanel.transform.position = UIPanel.transform.position + new Vector3(0, -1330, 0); // 0621 상현
                 }
@@ -242,15 +245,17 @@ public class ScrollScreen : MonoBehaviour
             case 1: // 아래로 쓸어넘기기 ( ↓ )
                 if ((now_x + 1) < 6 && ismap[now_x + 1, now_y] == true)
                 {
+
+                    Debug.Log("" + (now_x +1) + " " + now_y);
                     now_x++;
                     //Scr.Translate(DownScreen);
-
+                    Debug.Log("아래로 내려가기");
                     x_current = Cam.transform.position.x;
                     y_current = Cam.transform.position.y;
 
                     x_target = Cam.transform.position.x;
                     y_target = Cam.transform.position.y + 1330;
-                    
+
 
                     StartCoroutine(smoothMove(x_current, y_current, x_target, y_target));
                     UIPanel.transform.position = UIPanel.transform.position + new Vector3(0, 1330, 0); // 0621 상현
@@ -259,15 +264,17 @@ public class ScrollScreen : MonoBehaviour
             case 2: // 왼쪽으로 쓸어넘기기 ( <- )
                 if ((now_y - 1) >= 0 && ismap[now_x, now_y - 1] == true)
                 {
+
+                    Debug.Log("" + (now_x) + " " + (now_y-1));
                     now_y--;
                     //Scr.Translate(LeftScreen);
-
+                    Debug.Log("왼쪽으로 넘어가기");
                     x_current = Cam.transform.position.x;
                     y_current = Cam.transform.position.y;
 
                     x_target = Cam.transform.position.x - 800;
                     y_target = Cam.transform.position.y;
-                    
+
 
                     StartCoroutine(smoothMove(x_current, y_current, x_target, y_target));
                     UIPanel.transform.position = UIPanel.transform.position + new Vector3(-800, 0, 0); // 0621 상현
@@ -276,15 +283,17 @@ public class ScrollScreen : MonoBehaviour
             case 3: // 오른쪽으로 쓸어넘기기 ( -> )
                 if ((now_y + 1) < 6 && ismap[now_x, now_y + 1] == true)
                 {
+
+                    Debug.Log("" + (now_x) + " " + (now_y+1));
                     now_y++;
                     //Scr.Translate(RightScreen);
-
+                    Debug.Log("오른쪽으로 넘어가기");
                     x_current = Cam.transform.position.x;
                     y_current = Cam.transform.position.y;
 
                     x_target = Cam.transform.position.x + 800;
                     y_target = Cam.transform.position.y;
-                    
+
 
                     StartCoroutine(smoothMove(x_current, y_current, x_target, y_target));
                     UIPanel.transform.position = UIPanel.transform.position + new Vector3(800, 0, 0); // 0621 상현

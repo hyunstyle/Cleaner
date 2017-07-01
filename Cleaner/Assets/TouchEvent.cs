@@ -39,24 +39,6 @@ public class TouchEvent : MonoBehaviour {
        
         effectCount = 0;
     }
-
-    public void scavenger(Vector2 pos)
-    {
-        Collider2D[] detected = Physics2D.OverlapCircleAll(pos, 10f);//Physics.OverlapSphere(pos, 100f);
-        //Physics2D.OverlapCircleAll
-        Debug.Log("length : " + detected.Length);
-        foreach (Collider2D col in detected)
-        {
-
-            GameObject obj = col.transform.gameObject;
-            obj.transform.gameObject.name = "asdfsa";
-           
-            float x = MonsterMoveMent.xForce;
-            float y = MonsterMoveMent.yForce;
-            obj.GetComponent<Rigidbody2D>().AddRelativeForce(3000f * new Vector2(x, y));
-                        //col.GetComponent<Rigidbody>().AddRelativeForce(new Vector2(x, y)
-        }
-    }
     void Update ()
     {
         if(effectCount == MAX_EFFECT_COUNT)
@@ -85,7 +67,6 @@ public class TouchEvent : MonoBehaviour {
                     currentEffect[effectCount] = Instantiate(dusterEffect);
                     currentEffect[effectCount].transform.position = this.transform.position;
                     currentEffect[effectCount].transform.parent = this.transform;
-
                     Destroy(currentEffect[effectCount], 0.5f);
                     effectCount++;
                     break;
@@ -100,8 +81,6 @@ public class TouchEvent : MonoBehaviour {
                     currentEffect[effectCount] = Instantiate(scavengerEffect);
                     currentEffect[effectCount].transform.position = this.transform.position;
                     currentEffect[effectCount].transform.parent = this.transform;
-
-                    //scavenger(this.transform.position);
                     Destroy(currentEffect[effectCount], 0.5f);
                     effectCount++;
                     break;

@@ -6,13 +6,10 @@ public class MonsterMoveMent : MonoBehaviour
 {
     public float MIN_SPEED = 1000f;
     public float MAX_SPEED = 2000f;
-    public float directionChangeTime = 2f;
+    public float directionChangeTime = 1f;
 
     private float PdirectionChangeTime;
     Rigidbody2D obj;
-
-    public static float xForce;
-    public static float yForce;
 
     private void Start()
     {
@@ -41,8 +38,6 @@ public class MonsterMoveMent : MonoBehaviour
         float x = Random.Range(-1f, 1f);
         float y = Random.Range(-1f, 1f);
 
-        xForce = x;
-        yForce = y;
         obj.AddRelativeForce(speed * new Vector2(x, y));
         
        
